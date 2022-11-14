@@ -20,6 +20,7 @@
     "@babel/plugin-syntax-import-meta": "7.10.4",
     "@elzzad/dazzle-babel-loader": "^0.1.0-alpha.1",
     "browserslist": "^4.21.4",
+    "chai": "^4.3.7",
     "css-loader": "^6.7.2",
     "mini-css-extract-plugin": "^2.6.1",
     "postcss": "^8.4.19",
