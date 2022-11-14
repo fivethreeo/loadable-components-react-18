@@ -1,0 +1,5 @@
+[client]
+default
+
+[server]
+node 12
