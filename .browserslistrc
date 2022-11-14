@@ -1,5 +1,5 @@
 [client]
-default
+defaults
 
 [server]
-node 12
+maintained node versions

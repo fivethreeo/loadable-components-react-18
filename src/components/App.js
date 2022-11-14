@@ -1,8 +1,6 @@
 import React from 'react';
 import { Helmet } from "react-helmet";
 
-const Remote1Content = React.lazy(() => import('remote1/Content'));
-
 
 export default () => (
   <div>
@@ -19,7 +17,6 @@ export default () => (
     </div>
    
     <React.Suspense fallback={<h1>Loading....</h1>}>
-      <Remote1Content />
     </React.Suspense>
   </div >
 );
