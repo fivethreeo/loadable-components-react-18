@@ -7,7 +7,8 @@ const auto = require("./auto")
 const typescript = require("./typescript");
 const assets = require("./assets")
 const css = require("./css");
-const { should } = require("chai");
+
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const config = {
   name: "server",
@@ -35,6 +36,12 @@ const config = {
   plugins: [
     ...css.plugins.prod.client,
   ],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new CssMinimizerPlugin(),
+    ],
+  },
   stats: {
     colors: true,
   },

@@ -113,7 +113,7 @@ const config = {
             server: [],
             client: []
         }
-    },
+    }
 };
 
 
