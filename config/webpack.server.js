@@ -16,7 +16,7 @@ const config = {
     filename: "[name].js",
     libraryTarget: "commonjs-module",
   },
-  mode: "production",
+  mode: shared.prod.mode,
   resolve: {
     extensions: shared.prod.extensions
   },

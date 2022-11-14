@@ -7,12 +7,13 @@ const auto = require("./auto")
 const typescript = require("./typescript");
 const assets = require("./assets")
 const css = require("./css");
+const { should } = require("chai");
 
 const config = {
   name: "server",
   target: "browserslist:client",
   entry: [path.resolve(__dirname, "../src/index.js")],
-  mode: "production",
+  mode: shared.prod.mode,
   devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "../dist/client"),

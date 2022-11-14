@@ -1,23 +1,99 @@
-
 const clone = require("./clone")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+const postCssOptions = {
+    sourceMap: false,
+    plugins: [
+        "autoprefixer", {
+            env: "client"
+        }
+    ],
+};
 
 const config = {
     rules: {
         prod: {
-            server: [],
-            client: [],
+            server: [
+                {
+                    loader: "css-loader",
+                    options: {
+                        importLoaders: 1,
+                        modules: {
+                            auto: true,
+                            exportOnlyLocals: true,
+                            localIdentName: "[name]__[local]___[hash:base64:5]"
+                        },
+                    }
+                }],
+
+            client: [
+                {
+                    loader: MiniCssExtractPlugin.loader,
+                },
+                {
+                    loader: "css-loader",
+                    options: {
+                        sourceMap: false,
+                        importLoaders: 1,
+                        modules: {
+                            auto: true,
+                            localIdentName: "[name]__[local]___[hash:base64:5]",
+                        },
+                    }
+                },
+                {
+                    loader: "postcss-loader",
+                    options: postCssOptions,
+                }]
         },
 
 
         dev: {
-            server: [],
-            client: [],
+            server: [
+                {
+                    loader: "css-loader",
+                    options: {
+                        importLoaders: 1,
+                        modules: {
+                            auto: true,
+                            exportOnlyLocals: true,
+                            localIdentName: "[name]__[local]___[hash:base64:5]"
+                        },
+                    }
+                }],
+
+            client: [
+                {
+                    loader: "style-loader",
+                },
+                {
+                    loader: "css-loader",
+                    options: {
+                        sourceMap: true,
+                        importLoaders: 1,
+                        modules: {
+                            auto: true,
+                            localIdentName: "[name]__[local]___[hash:base64:5]",
+                        },
+                    }
+                },
+                {
+                    loader: "postcss-loader",
+                    options: { postcssOptions: postCssOptions },
+                }]
         }
     },
     plugins: {
         prod: {
             server: [],
-            client: []
+            client: [
+                new MiniCssExtractPlugin({
+                    // Options similar to the same options in webpackOptions.output
+                    // both options are optional
+                    filename: "[name].css",
+                    chunkFilename: "[id].css",
+                })
+            ]
         },
 
 
@@ -28,12 +104,5 @@ const config = {
     },
 };
 
-config.rules.prod.client = clone(config.rules.prod.server);
-config.rules.dev.server = clone(config.rules.prod.server);
-config.rules.dev.client = clone(config.rules.prod.server);
-
-config.plugins.prod.client = clone(config.plugins.prod.server);
-config.plugins.dev.server = clone(config.plugins.prod.server);
-config.plugins.dev.client = clone(config.plugins.prod.server);
 
 module.exports = config;

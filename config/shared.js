@@ -4,11 +4,15 @@ const config = {
     prod: {
         moduleids: "deterministic",
         extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
+        mode: "production"
     },
 
     dev: {}
 };
 
-config.dev = clone(config.prod);
+config.dev = Object.assign(
+    clone(config.prod),
+    { mode: "development" }
+);
 
 module.exports = config;
