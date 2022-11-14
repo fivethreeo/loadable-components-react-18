@@ -14,7 +14,7 @@ const config = {
   name: "server",
   target: "browserslist:client",
   entry: [path.resolve(__dirname, "../src/index.js")],
-  mode: shared.prod.mode,
+  mode: shared.prodMode,
   devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "../dist/client"),
@@ -23,7 +23,7 @@ const config = {
     publicPath: "http://localhost:3000/static/",
   },
   resolve: {
-    extensions: shared.prod.extensions
+    extensions: shared.extensions
   },
   module: {
     rules: [
@@ -38,6 +38,7 @@ const config = {
   ],
   optimization: {
     minimize: true,
+    moduleIds: shared.moduleids,
     minimizer: [
       new CssMinimizerPlugin(),
     ],

@@ -16,9 +16,9 @@ const config = {
     filename: "[name].js",
     libraryTarget: "commonjs-module",
   },
-  mode: shared.prod.mode,
+  mode: shared.prodMode,
   resolve: {
-    extensions: shared.prod.extensions
+    extensions: shared.extensions
   },
   module: {
     rules: [
@@ -31,6 +31,9 @@ const config = {
   plugins: [
     ...css.plugins.prod.server,
   ],
+  optimization: {
+    moduleIds: shared.moduleids
+  },
   stats: {
     colors: true,
   },
