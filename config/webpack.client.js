@@ -11,7 +11,7 @@ const css = require("./css");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const config = {
-  name: "server",
+  name: "client",
   target: "browserslist:client",
   entry: [path.resolve(__dirname, "../src/index.js")],
   mode: shared.prodMode,
@@ -37,7 +37,7 @@ const config = {
     ...css.plugins.prod.client,
   ],
   optimization: {
-    minimize: true,
+    minimize: shared.prodMinimizeClient,
     moduleIds: shared.moduleids,
     minimizer: [
       new CssMinimizerPlugin(),
