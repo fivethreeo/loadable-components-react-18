@@ -1,6 +1,8 @@
 const util = require("util")
 const path = require("path");
 
+const webpack = require("webpack");
+
 const shared = require("./shared");
 const auto = require("./features/auto")
 const typescript = require("./features/typescript");
@@ -35,7 +37,12 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.client,
-    new LoadablePlugin()
+    new LoadablePlugin(),
+      // No need for any caniuse regions data (for require context in browserslist)
+      new webpack.ContextReplacementPlugin(
+        /caniuse-lite[\/\\]data[\/\\]regions/,
+        /^$/,
+      ),
   ],
   optimization: {
     minimize: shared.devMinimizeClient,

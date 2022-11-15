@@ -1,5 +1,6 @@
 const util = require("util")
 const path = require("path");
+const externals = require("./stubs/externals");
 
 const shared = require("./shared");
 const auto = require("./features/auto")
@@ -21,6 +22,7 @@ const config = {
   resolve: {
     extensions: shared.extensions
   },
+  externals: externals,
   module: {
     rules: [
       ...auto.rules.prod.server,

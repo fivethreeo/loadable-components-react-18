@@ -1,6 +1,8 @@
 const util = require("util")
 const path = require("path");
 
+const webpack = require("webpack");
+const externals = require("./stubs/externals");
 const shared = require("./shared");
 const auto = require("./features/auto")
 const typescript = require("./features/typescript");
@@ -23,6 +25,7 @@ const config = {
   resolve: {
     extensions: shared.extensions
   },
+  externals: externals,
   module: {
     rules: [
       ...auto.rules.dev.server,
@@ -33,7 +36,21 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.server,
-    new StartServerPlugin("main")
+    new StartServerPlugin("main"),
+    new webpack.ContextReplacementPlugin(
+      // we want to replace context
+      /express\/lib/,                    // and replace all searches in
+      // express/lib/*
+      path.resolve('node_modules'),      // to look in folder 'node_modules'
+      {                                  // and return a map
+        'ejs': 'ejs'                     // which resolves request for 'ejs'
+      }                                  // to module 'ejs'
+    )                                    // __webpack_require__(...)(mod)
+    ,    // No need for any caniuse regions data (for require context in browserslist)
+    new webpack.ContextReplacementPlugin(
+      /caniuse-lite[\/\\]data[\/\\]regions/,
+      /^$/,
+    ),
   ],
   optimization: {
     moduleIds: shared.moduleids
