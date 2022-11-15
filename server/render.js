@@ -7,14 +7,18 @@ import Html from './html.jsx';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import fs from  'fs/promises';
+import { data } from 'browserslist';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const statsFile = join(__dirname, "../client/loadable-stats.json");
+const statsFile = join(__dirname, "../dist/client/loadable-stats.json");
 
 export default async (req, res, next) => {
   let didError = false;
   let shellReady = false;
-  const extractor = new StreamingChunkExtractor({ statsFile })
+  console.log(__dirname)
+  let stats = await fs.readFile(statsFile).then(data=>JSON.parse(data)).catch(()=>({}))
+
+  const extractor = new StreamingChunkExtractor({ stats })
   
   class LoadableWritable extends Writable {
     constructor(writable) {

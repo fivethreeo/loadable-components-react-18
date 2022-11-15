@@ -27,6 +27,10 @@ function assetToScriptTag(asset, extraProps) {
         )}></script>`
 }
 
+function joinTags(tags) {
+    return tags.join('\n')
+}
+
 export class StreamingChunkExtractor extends ChunkExtractor {
 
     constructor(props) {
@@ -48,7 +52,7 @@ export class StreamingChunkExtractor extends ChunkExtractor {
 
     getScriptTagsSince(extraProps = {}) {
         const mainAssets = this.getMainAssets('script')
-        const assetsScriptTags = mainAssets.map(asset =>{
+        const assetsScriptTags = mainAssets.map(asset => {
             if (!this.seenChunks.includes(asset.chunk.id)) {
                 this.seenChunks.push(asset.chunk.id)
                 return assetToScriptTag(asset, extraProps)
