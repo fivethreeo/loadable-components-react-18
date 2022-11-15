@@ -9,6 +9,7 @@ const css = require("./features/css");
 
 const config = {
   name: "server",
+  dependencies: ["client"],
   target: "browserslist:server",
   entry: [path.resolve(__dirname, "../server/index.js")],
   output: {
@@ -16,20 +17,20 @@ const config = {
     filename: "[name].js",
     libraryTarget: "commonjs-module",
   },
-  mode: shared.prodMode,
+  mode: shared.devMode,
   resolve: {
     extensions: shared.extensions
   },
   module: {
     rules: [
-      ...auto.rules.prod.server,
-      ...typescript.rules.prod.server,
-      ...assets.rules.prod.server,
-      ...css.rules.prod.server
+      ...auto.rules.dev.server,
+      ...typescript.rules.dev.server,
+      ...assets.rules.dev.server,
+      ...css.rules.dev.server
     ]
   },
   plugins: [
-    ...css.plugins.prod.server,
+    ...css.plugins.dev.server,
   ],
   optimization: {
     moduleIds: shared.moduleids
