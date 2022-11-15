@@ -7,6 +7,8 @@ const typescript = require("./features/typescript");
 const assets = require("./features/assets")
 const css = require("./features/css");
 
+const StartServerPlugin = require("razzle-start-server-webpack-plugin");
+
 const config = {
   name: "server",
   dependencies: ["client"],
@@ -31,6 +33,7 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.server,
+    new StartServerPlugin("main")
   ],
   optimization: {
     moduleIds: shared.moduleids

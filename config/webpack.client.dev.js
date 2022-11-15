@@ -45,6 +45,12 @@ const config = {
   stats: {
     colors: true,
   },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, '../public'),
+    },
+    port: 3001,
+  },
 };
 
 console.log(util.inspect(config, false, 6, true));
