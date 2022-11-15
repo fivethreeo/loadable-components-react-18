@@ -14,20 +14,12 @@ export default async (req, res, next) => {
       this._writable = writable;
     }
 
-
     _write(chunk, encoding, callback) {
       // This should pick up any new link tags that hasn't been previously
       // written to this stream.
-      /*     let scriptTags = generateNewScriptTagsSinceLastCall();
-          if (scriptTags) {
-            // Write it before the HTML to ensure that we can start
-            // downloading it as early as possible.
-            this._writable.write(scriptTags);
-          } */
-      // Finally write whatever React tried to write.
       if (shellReady) {
-        this._writable.write("ggg");
       }
+      // Finally write whatever React tried to write.
 
       this._writable.write(chunk, encoding, callback);
     }
@@ -42,7 +34,9 @@ export default async (req, res, next) => {
       }
     }
   }
+
   const writeable = new LoadableWritable(res)
+
   const stream = renderToPipeableStream(<Html assets={{}}><App /></Html>,
     {
       onShellReady() {
