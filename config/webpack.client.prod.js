@@ -8,6 +8,7 @@ const assets = require("./features/assets")
 const css = require("./features/css");
 
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const LoadablePlugin = require('@loadable/webpack-plugin')
 
 const config = {
   name: "client",
@@ -34,6 +35,7 @@ const config = {
   },
   plugins: [
     ...css.plugins.prod.client,
+    new LoadablePlugin(),
   ],
   optimization: {
     minimize: shared.prodMinimizeClient,
