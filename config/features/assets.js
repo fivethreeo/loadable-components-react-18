@@ -1,4 +1,4 @@
-const clone = require("./clone")
+const clone = require("../clone")
 
 const fileLoaderExclude = [
     /\.html$/,

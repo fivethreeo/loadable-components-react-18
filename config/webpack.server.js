@@ -2,10 +2,10 @@ const util = require("util")
 const path = require("path");
 
 const shared = require("./shared");
-const auto = require("./auto")
-const typescript = require("./typescript");
-const assets = require("./assets")
-const css = require("./css");
+const auto = require("./features/auto")
+const typescript = require("./features/typescript");
+const assets = require("./features/assets")
+const css = require("./features/css");
 
 const config = {
   name: "server",
