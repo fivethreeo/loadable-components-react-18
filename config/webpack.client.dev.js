@@ -49,6 +49,9 @@ const config = {
     static: {
       directory: path.join(__dirname, '../public'),
     },
+    devMiddleware: {
+      writeToDisk: true
+    },
     port: 3001,
   },
 };

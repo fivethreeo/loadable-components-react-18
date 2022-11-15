@@ -7,7 +7,6 @@ specifiers:
   '@babel/plugin-syntax-dynamic-import': 7.8.3
   '@babel/plugin-syntax-import-meta': 7.10.4
   '@elzzad/dazzle-babel-loader': ^0.1.0-alpha.1
-  '@elzzad/dazzle-start-server-webpack-plugin': ^0.1.0-alpha.1
   babel-plugin-polyfill-corejs3: ^0.6.0
   browserslist: ^4.21.4
   chai: ^4.3.7
@@ -21,6 +20,7 @@ specifiers:
   react: ^18.2.0
   react-dom: ^18.2.0
   react-helmet: ^6.1.0
+  react-streaming: ^0.3.5
   rimraf: ^3.0.2
   style-loader: ^3.3.1
   webpack: ^5.75.0
@@ -40,7 +40,6 @@ devDependencies:
   '@babel/plugin-syntax-dynamic-import': 7.8.3
   '@babel/plugin-syntax-import-meta': 7.10.4
   '@elzzad/dazzle-babel-loader': 0.1.0-alpha.1_webpack@5.75.0
-  '@elzzad/dazzle-start-server-webpack-plugin': 0.1.0-alpha.1_webpack@5.75.0
   babel-plugin-polyfill-corejs3: 0.6.0
   browserslist: 4.21.4
   chai: 4.3.7
@@ -50,6 +49,7 @@ devDependencies:
   postcss: 8.4.19
   postcss-loader: 7.0.1_postcss@8.4.19+webpack@5.75.0
   razzle-start-server-webpack-plugin: 4.2.18_webpack@5.75.0
+  react-streaming: 0.3.5_react-dom@18.2.0+react@18.2.0
   rimraf: 3.0.2
   style-loader: 3.3.1_webpack@5.75.0
   webpack: 5.75.0_webpack-cli@4.10.0
@@ -1455,6 +1455,10 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
+  /@brillout/json-serializer/0.5.3:
+    resolution: {integrity: sha512-IxlOMD5gOM0WfFGdeR98jHKiC82Ad1tUnSjvLS5jnRkfMEKBI+YzHA32Umw8W3Ccp5N4fNEX229BW6RaRpxRWQ==}
+    dev: true
+
   /@discoveryjs/json-ext/0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
@@ -1493,15 +1497,6 @@ packages:
       webpack: 5.75.0_webpack-cli@4.10.0
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /@elzzad/dazzle-start-server-webpack-plugin/0.1.0-alpha.1_webpack@5.75.0:
-    resolution: {integrity: sha512-2teawCDqBu8wD+f9WvfokKFsSVKWnAUoDxsvH0IXTs2T5yAkqq4CwnOgCt7HdGVKUgzTKM/YU83sOxLqsbMDhA==}
-    peerDependencies:
-      '@elzzad/dazzle': 0.1.0-alpha.1
-      webpack: ^5.0.0
-    dependencies:
-      webpack: 5.75.0_webpack-cli@4.10.0
     dev: true
 
   /@jest/schemas/29.0.0:
@@ -3149,6 +3144,11 @@ packages:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
     dev: true
 
+  /isbot-fast/1.2.0:
+    resolution: {integrity: sha512-twjuQzy2gKMDVfKGQyQqrx6Uy4opu/fiVUTTpdqtFsd7OQijIp5oXvb27n5EemYXaijh5fomndJt/SPRLsEdSg==}
+    engines: {node: '>=6.0.0'}
+    dev: true
+
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
@@ -4034,6 +4034,18 @@ packages:
     dependencies:
       react: 18.2.0
     dev: false
+
+  /react-streaming/0.3.5_react-dom@18.2.0+react@18.2.0:
+    resolution: {integrity: sha512-/Yy4Uarn2qiGe8pRY+LvzFRBAVjU2vN8CfzQI9qdW6E6gbqg6PsCgy04zudZO3Ht0xwg7B3WWZuA+kZ2HHwR9Q==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+    dependencies:
+      '@brillout/json-serializer': 0.5.3
+      isbot-fast: 1.2.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: true
 
   /react/18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
