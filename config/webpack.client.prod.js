@@ -19,7 +19,7 @@ const config = {
     path: path.resolve(__dirname, "../dist/client"),
     filename: "[name].js",
     chunkFilename: "[name].js",
-    publicPath: "http://localhost:3000/static/",
+    publicPath: "http://localhost:3001/static/",
   },
   resolve: {
     extensions: shared.extensions

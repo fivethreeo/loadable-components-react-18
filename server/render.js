@@ -1,13 +1,21 @@
 import React from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 import { Writable } from 'stream';
+import { StreamingChunkExtractor } from './streamingChunkextractor';
 import App from '../src/components/App';
 import Html from './html.jsx';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import fs from  'fs/promises';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const statsFile = join(__dirname, "../client/loadable-stats.json");
 
 export default async (req, res, next) => {
   let didError = false;
   let shellReady = false;
-
+  const extractor = new StreamingChunkExtractor({ statsFile })
+  
   class LoadableWritable extends Writable {
     constructor(writable) {
       super();
@@ -18,6 +26,8 @@ export default async (req, res, next) => {
       // This should pick up any new link tags that hasn't been previously
       // written to this stream.
       if (shellReady) {
+        this._writable.write(extractor.getScriptTagsSince())
+        this._writable.write(extractor.getLinkTagsSince())
       }
       // Finally write whatever React tried to write.
 
@@ -36,8 +46,7 @@ export default async (req, res, next) => {
   }
 
   const writeable = new LoadableWritable(res)
-
-  const stream = renderToPipeableStream(<Html assets={{}}><App /></Html>,
+  const stream = renderToPipeableStream(extractor.collectChunks(<Html><App /></Html>),
     {
       onShellReady() {
         // The content above all Suspense boundaries is ready.

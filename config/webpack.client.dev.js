@@ -8,6 +8,7 @@ const assets = require("./features/assets")
 const css = require("./features/css");
 
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const LoadablePlugin = require('@loadable/webpack-plugin')
 
 const config = {
   name: "client",
@@ -19,7 +20,7 @@ const config = {
     path: path.resolve(__dirname, "../dist/client"),
     filename: "[name].js",
     chunkFilename: "[name].js",
-    publicPath: "http://localhost:3000/static/",
+    publicPath: "http://localhost:3001/static/",
   },
   resolve: {
     extensions: shared.extensions
@@ -34,6 +35,7 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.client,
+    new LoadablePlugin()
   ],
   optimization: {
     minimize: shared.devMinimizeClient,

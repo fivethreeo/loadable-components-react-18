@@ -1,12 +1,11 @@
 
-export default function Html({ assets, children, title }) {
+export default function Html({ children, title }) {
     return (
       <html lang="en">
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="shortcut icon" href="favicon.ico" />
-          <link rel="stylesheet" href={assets["main.css"]} />
           <title>{title}</title>
         </head>
         <body>
@@ -16,11 +15,6 @@ export default function Html({ assets, children, title }) {
             }}
           />
           {children}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `assetManifest = ${JSON.stringify(assets)};`
-            }}
-          />
         </body>
       </html>
     );
