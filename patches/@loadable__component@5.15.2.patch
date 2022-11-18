@@ -1,0 +1,325 @@
+diff --git a/dist/loadable.cjs.js b/dist/loadable.cjs.js
+index 43a6ff3528ccc271242a5bdba8948f269fa7d407..7ebfc3fc2decb3016b924e3af20986a65066c532 100644
+--- a/dist/loadable.cjs.js
++++ b/dist/loadable.cjs.js
+@@ -44,6 +44,71 @@ var LOADABLE_SHARED = {
+   initialChunks: {}
+ };
+ 
++var Uninitialized = -1;
++var Pending = 0;
++var Resolved = 1;
++var Rejected = 2;
++var REACT_LAZY_TYPE =
++/*#__PURE__*/
++Symbol["for"]("react.lazy");
++
++function lazyInitializer(payload) {
++  if (payload._status === Uninitialized) {
++    var thenable = payload._ctor.requireAsync(); // Transition to the next state.
++    // This might throw either because it's missing or throws. If so, we treat it
++    // as still uninitialized and try again next time. Which is the same as what
++    // happens if the ctor or any wrappers processing the ctor throws. This might
++    // end up fixing it if the resolution was a concurrency bug.
++
++
++    thenable.then(function (moduleObject) {
++      if (payload._status === Pending || payload._status === Uninitialized) {
++        // Transition to the next state.
++        var resolved = payload;
++        resolved._status = Resolved;
++        resolved._result = moduleObject;
++      }
++    }, function (error) {
++      if (payload._status === Pending || payload._status === Uninitialized) {
++        // Transition to the next state.
++        var rejected = payload;
++        rejected._status = Rejected;
++        rejected._result = error;
++      }
++    });
++
++    if (payload._status === Uninitialized) {
++      // In case, we're still uninitialized, then we're waiting for the thenable
++      // to resolve. Set it as pending in the meantime.
++      var pending = payload;
++      pending._status = Pending;
++      pending._result = thenable;
++    }
++  }
++
++  if (payload._status === Resolved) {
++    var moduleObject = payload._result;
++    return payload._ctor.onResolve(moduleObject["default"]);
++  } else {
++    throw payload._result;
++  }
++}
++
++function lazyReact(ctor) {
++  var payload = {
++    // We use these fields to store the result.
++    _status: Uninitialized,
++    _result: ctor.requireAsync,
++    _ctor: ctor
++  };
++  var lazyType = {
++    $$typeof: REACT_LAZY_TYPE,
++    _payload: payload,
++    _init: lazyInitializer
++  };
++  return lazyType;
++}
++
+ var STATUS_PENDING = 'PENDING';
+ var STATUS_RESOLVED = 'RESOLVED';
+ var STATUS_REJECTED = 'REJECTED';
+@@ -402,6 +467,7 @@ function createLoadable(_ref) {
+       return InnerLoadable;
+     }(React.Component);
+ 
++    if (options.ssrSuspense) return ssrLazy(ctor);
+     var EnhancedInnerLoadable = withChunkExtractor(InnerLoadable);
+     var Loadable = React.forwardRef(function (props, ref) {
+       return React.createElement(EnhancedInnerLoadable, Object.assign({
+@@ -421,6 +487,21 @@ function createLoadable(_ref) {
+     return Loadable;
+   }
+ 
++  function ssrLazy(ctor) {
++    return lazyReact(_extends({}, ctor, {
++      onResolve: function onResolve(Component) {
++        return withChunkExtractor(function (_ref2) {
++          var forwardRef = _ref2.forwardRef,
++              __chunkExtractor = _ref2.__chunkExtractor,
++              props = _objectWithoutPropertiesLoose(_ref2, ["forwardRef", "__chunkExtractor"]);
++
++          if (__chunkExtractor) __chunkExtractor.addChunk(ctor.chunkName(props));
++          return React.createElement(Component, props);
++        });
++      }
++    }));
++  }
++
+   function lazy(ctor, options) {
+     return loadable(ctor, _extends({}, options, {
+       suspense: true
+diff --git a/dist/loadable.esm.js b/dist/loadable.esm.js
+index 3b90d9c04686626678597a52e9284b781ada70bb..eb3c2cf573fb63b2b30d9df7cbd114373096a536 100644
+--- a/dist/loadable.esm.js
++++ b/dist/loadable.esm.js
+@@ -38,6 +38,71 @@ var LOADABLE_SHARED = {
+   initialChunks: {}
+ };
+ 
++var Uninitialized = -1;
++var Pending = 0;
++var Resolved = 1;
++var Rejected = 2;
++var REACT_LAZY_TYPE =
++/*#__PURE__*/
++Symbol["for"]("react.lazy");
++
++function lazyInitializer(payload) {
++  if (payload._status === Uninitialized) {
++    var thenable = payload._ctor.requireAsync(); // Transition to the next state.
++    // This might throw either because it's missing or throws. If so, we treat it
++    // as still uninitialized and try again next time. Which is the same as what
++    // happens if the ctor or any wrappers processing the ctor throws. This might
++    // end up fixing it if the resolution was a concurrency bug.
++
++
++    thenable.then(function (moduleObject) {
++      if (payload._status === Pending || payload._status === Uninitialized) {
++        // Transition to the next state.
++        var resolved = payload;
++        resolved._status = Resolved;
++        resolved._result = moduleObject;
++      }
++    }, function (error) {
++      if (payload._status === Pending || payload._status === Uninitialized) {
++        // Transition to the next state.
++        var rejected = payload;
++        rejected._status = Rejected;
++        rejected._result = error;
++      }
++    });
++
++    if (payload._status === Uninitialized) {
++      // In case, we're still uninitialized, then we're waiting for the thenable
++      // to resolve. Set it as pending in the meantime.
++      var pending = payload;
++      pending._status = Pending;
++      pending._result = thenable;
++    }
++  }
++
++  if (payload._status === Resolved) {
++    var moduleObject = payload._result;
++    return payload._ctor.onResolve(moduleObject["default"]);
++  } else {
++    throw payload._result;
++  }
++}
++
++function lazyReact(ctor) {
++  var payload = {
++    // We use these fields to store the result.
++    _status: Uninitialized,
++    _result: ctor.requireAsync,
++    _ctor: ctor
++  };
++  var lazyType = {
++    $$typeof: REACT_LAZY_TYPE,
++    _payload: payload,
++    _init: lazyInitializer
++  };
++  return lazyType;
++}
++
+ var STATUS_PENDING = 'PENDING';
+ var STATUS_RESOLVED = 'RESOLVED';
+ var STATUS_REJECTED = 'REJECTED';
+@@ -396,6 +461,7 @@ function createLoadable(_ref) {
+       return InnerLoadable;
+     }(React.Component);
+ 
++    if (options.ssrSuspense) return ssrLazy(ctor);
+     var EnhancedInnerLoadable = withChunkExtractor(InnerLoadable);
+     var Loadable = React.forwardRef(function (props, ref) {
+       return React.createElement(EnhancedInnerLoadable, Object.assign({
+@@ -415,6 +481,21 @@ function createLoadable(_ref) {
+     return Loadable;
+   }
+ 
++  function ssrLazy(ctor) {
++    return lazyReact(_extends({}, ctor, {
++      onResolve: function onResolve(Component) {
++        return withChunkExtractor(function (_ref2) {
++          var forwardRef = _ref2.forwardRef,
++              __chunkExtractor = _ref2.__chunkExtractor,
++              props = _objectWithoutPropertiesLoose(_ref2, ["forwardRef", "__chunkExtractor"]);
++
++          if (__chunkExtractor) __chunkExtractor.addChunk(ctor.chunkName(props));
++          return React.createElement(Component, props);
++        });
++      }
++    }));
++  }
++
+   function lazy(ctor, options) {
+     return loadable(ctor, _extends({}, options, {
+       suspense: true
+diff --git a/dist/loadable.js b/dist/loadable.js
+index cb2da8d09b6252abb684d57d04d33573af1eee0f..006f392660301cda0dae5b48ef458a87b8b9653b 100644
+--- a/dist/loadable.js
++++ b/dist/loadable.js
+@@ -610,6 +610,71 @@
+     initialChunks: {}
+   };
+ 
++  var Uninitialized = -1;
++  var Pending = 0;
++  var Resolved = 1;
++  var Rejected = 2;
++  var REACT_LAZY_TYPE =
++  /*#__PURE__*/
++  Symbol["for"]("react.lazy");
++
++  function lazyInitializer(payload) {
++    if (payload._status === Uninitialized) {
++      var thenable = payload._ctor.requireAsync(); // Transition to the next state.
++      // This might throw either because it's missing or throws. If so, we treat it
++      // as still uninitialized and try again next time. Which is the same as what
++      // happens if the ctor or any wrappers processing the ctor throws. This might
++      // end up fixing it if the resolution was a concurrency bug.
++
++
++      thenable.then(function (moduleObject) {
++        if (payload._status === Pending || payload._status === Uninitialized) {
++          // Transition to the next state.
++          var resolved = payload;
++          resolved._status = Resolved;
++          resolved._result = moduleObject;
++        }
++      }, function (error) {
++        if (payload._status === Pending || payload._status === Uninitialized) {
++          // Transition to the next state.
++          var rejected = payload;
++          rejected._status = Rejected;
++          rejected._result = error;
++        }
++      });
++
++      if (payload._status === Uninitialized) {
++        // In case, we're still uninitialized, then we're waiting for the thenable
++        // to resolve. Set it as pending in the meantime.
++        var pending = payload;
++        pending._status = Pending;
++        pending._result = thenable;
++      }
++    }
++
++    if (payload._status === Resolved) {
++      var moduleObject = payload._result;
++      return payload._ctor.onResolve(moduleObject["default"]);
++    } else {
++      throw payload._result;
++    }
++  }
++
++  function lazyReact(ctor) {
++    var payload = {
++      // We use these fields to store the result.
++      _status: Uninitialized,
++      _result: ctor.requireAsync,
++      _ctor: ctor
++    };
++    var lazyType = {
++      $$typeof: REACT_LAZY_TYPE,
++      _payload: payload,
++      _init: lazyInitializer
++    };
++    return lazyType;
++  }
++
+   var STATUS_PENDING = 'PENDING';
+   var STATUS_RESOLVED = 'RESOLVED';
+   var STATUS_REJECTED = 'REJECTED';
+@@ -968,6 +1033,7 @@
+         return InnerLoadable;
+       }(React.Component);
+ 
++      if (options.ssrSuspense) return ssrLazy(ctor);
+       var EnhancedInnerLoadable = withChunkExtractor(InnerLoadable);
+       var Loadable = React.forwardRef(function (props, ref) {
+         return React.createElement(EnhancedInnerLoadable, Object.assign({
+@@ -987,6 +1053,21 @@
+       return Loadable;
+     }
+ 
++    function ssrLazy(ctor) {
++      return lazyReact(_extends({}, ctor, {
++        onResolve: function onResolve(Component) {
++          return withChunkExtractor(function (_ref2) {
++            var forwardRef = _ref2.forwardRef,
++                __chunkExtractor = _ref2.__chunkExtractor,
++                props = _objectWithoutPropertiesLoose(_ref2, ["forwardRef", "__chunkExtractor"]);
++
++            if (__chunkExtractor) __chunkExtractor.addChunk(ctor.chunkName(props));
++            return React.createElement(Component, props);
++          });
++        }
++      }));
++    }
++
+     function lazy(ctor, options) {
+       return loadable(ctor, _extends({}, options, {
+         suspense: true
+diff --git a/dist/loadable.min.js b/dist/loadable.min.js
+index 629e1ed3f8a53363a12cbff51827699659ed325d..bdba2fbfcd6a0d5a444d616aff04409be45824ec 100644
+--- a/dist/loadable.min.js
++++ b/dist/loadable.min.js
+@@ -1 +1 @@
+-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("react"),require("hoist-non-react-statics")):"function"==typeof define&&define.amd?define(["exports","react","hoist-non-react-statics"],t):t((e=e||self).loadable={},e.React,e.hoistNonReactStatics)}(this,(function(e,t,r){"use strict";function n(e,t){if(!e){var r=new Error("loadable: "+t);throw r.framesToPop=1,r.name="Invariant Violation",r}}function o(e){console.warn("loadable: "+e)}t=t&&t.hasOwnProperty("default")?t.default:t,r=r&&r.hasOwnProperty("default")?r.default:r;var a=t.createContext();function i(e){return e+"__LOADABLE_REQUIRED_CHUNKS__"}var s=Object.freeze({__proto__:null,getRequiredChunkKey:i,invariant:n,Context:a});function c(e,t){if(null==e)return{};var r,n,o={},a=Object.keys(e);for(n=0;n<a.length;n++)r=a[n],t.indexOf(r)>=0||(o[r]=e[r]);return o}function u(){return(u=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e}).apply(this,arguments)}function l(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function f(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}function d(e,t){return e(t={exports:{}},t.exports),t.exports}var p=d((function(e,t){Object.defineProperty(t,"__esModule",{value:!0});var r="function"==typeof Symbol&&Symbol.for,n=r?Symbol.for("react.element"):60103,o=r?Symbol.for("react.portal"):60106,a=r?Symbol.for("react.fragment"):60107,i=r?Symbol.for("react.strict_mode"):60108,s=r?Symbol.for("react.profiler"):60114,c=r?Symbol.for("react.provider"):60109,u=r?Symbol.for("react.context"):60110,l=r?Symbol.for("react.async_mode"):60111,f=r?Symbol.for("react.concurrent_mode"):60111,d=r?Symbol.for("react.forward_ref"):60112,p=r?Symbol.for("react.suspense"):60113,y=r?Symbol.for("react.suspense_list"):60120,m=r?Symbol.for("react.memo"):60115,h=r?Symbol.for("react.lazy"):60116,v=r?Symbol.for("react.fundamental"):60117,b=r?Symbol.for("react.responder"):60118,_=r?Symbol.for("react.scope"):60119;function C(e){if("object"==typeof e&&null!==e){var t=e.$$typeof;switch(t){case n:switch(e=e.type){case l:case f:case a:case s:case i:case p:return e;default:switch(e=e&&e.$$typeof){case u:case d:case h:case m:case c:return e;default:return t}}case o:return t}}}function S(e){return C(e)===f}t.typeOf=C,t.AsyncMode=l,t.ConcurrentMode=f,t.ContextConsumer=u,t.ContextProvider=c,t.Element=n,t.ForwardRef=d,t.Fragment=a,t.Lazy=h,t.Memo=m,t.Portal=o,t.Profiler=s,t.StrictMode=i,t.Suspense=p,t.isValidElementType=function(e){return"string"==typeof e||"function"==typeof e||e===a||e===f||e===s||e===i||e===p||e===y||"object"==typeof e&&null!==e&&(e.$$typeof===h||e.$$typeof===m||e.$$typeof===c||e.$$typeof===u||e.$$typeof===d||e.$$typeof===v||e.$$typeof===b||e.$$typeof===_)},t.isAsyncMode=function(e){return S(e)||C(e)===l},t.isConcurrentMode=S,t.isContextConsumer=function(e){return C(e)===u},t.isContextProvider=function(e){return C(e)===c},t.isElement=function(e){return"object"==typeof e&&null!==e&&e.$$typeof===n},t.isForwardRef=function(e){return C(e)===d},t.isFragment=function(e){return C(e)===a},t.isLazy=function(e){return C(e)===h},t.isMemo=function(e){return C(e)===m},t.isPortal=function(e){return C(e)===o},t.isProfiler=function(e){return C(e)===s},t.isStrictMode=function(e){return C(e)===i},t.isSuspense=function(e){return C(e)===p}}));f(p);p.typeOf,p.AsyncMode,p.ConcurrentMode,p.ContextConsumer,p.ContextProvider,p.Element,p.ForwardRef,p.Fragment,p.Lazy,p.Memo,p.Portal,p.Profiler,p.StrictMode,p.Suspense,p.isValidElementType,p.isAsyncMode,p.isConcurrentMode,p.isContextConsumer,p.isContextProvider,p.isElement,p.isForwardRef,p.isFragment,p.isLazy,p.isMemo,p.isPortal,p.isProfiler,p.isStrictMode,p.isSuspense;var y=d((function(e,t){}));f(y);y.typeOf,y.AsyncMode,y.ConcurrentMode,y.ContextConsumer,y.ContextProvider,y.Element,y.ForwardRef,y.Fragment,y.Lazy,y.Memo,y.Portal,y.Profiler,y.StrictMode,y.Suspense,y.isValidElementType,y.isAsyncMode,y.isConcurrentMode,y.isContextConsumer,y.isContextProvider,y.isElement,y.isForwardRef,y.isFragment,y.isLazy,y.isMemo,y.isPortal,y.isProfiler,y.isStrictMode,y.isSuspense,d((function(e){e.exports=p}));var m={initialChunks:{}};var h=function(e){return e};function v(e){var o=e.defaultResolveComponent,i=void 0===o?h:o,s=e.render,f=e.onLoad;function d(e,o){void 0===o&&(o={});var d=function(e){return"function"==typeof e?{requireAsync:e,resolve:function(){},chunkName:function(){}}:e}(e),p={};function y(e){return o.cacheKey?o.cacheKey(e):d.resolve?d.resolve(e):"static"}function h(e,t,n){var a=o.resolveComponent?o.resolveComponent(e,t):i(e);if(o.resolveComponent&&!(void 0)(a))throw new Error("resolveComponent returned something that is not a React component!");return r(n,a,{preload:!0}),a}var v,b,_=function(e){var t=y(e),r=p[t];return r&&"REJECTED"!==r.status||((r=d.requireAsync(e)).status="PENDING",p[t]=r,r.then((function(){r.status="RESOLVED"}),(function(t){console.error("loadable-components: failed to asynchronously load component",{fileName:d.resolve(e),chunkName:d.chunkName(e),error:t?t.message:t}),r.status="REJECTED"}))),r},C=function(e){var t,r;function a(t){var r;return(r=e.call(this,t)||this).state={result:null,error:null,loading:!0,cacheKey:y(t)},n(!t.__chunkExtractor||d.requireSync,"SSR requires `@loadable/babel-plugin`, please install it"),t.__chunkExtractor?!1===o.ssr?l(r):(d.requireAsync(t).catch((function(){return null})),r.loadSync(),t.__chunkExtractor.addChunk(d.chunkName(t)),l(r)):(!1!==o.ssr&&(d.isReady&&d.isReady(t)||d.chunkName&&m.initialChunks[d.chunkName(t)])&&r.loadSync(),r)}r=e,(t=a).prototype=Object.create(r.prototype),t.prototype.constructor=t,t.__proto__=r,a.getDerivedStateFromProps=function(e,t){var r=y(e);return u({},t,{cacheKey:r,loading:t.loading||t.cacheKey!==r})};var i=a.prototype;return i.componentDidMount=function(){this.mounted=!0;var e=this.getCache();e&&"REJECTED"===e.status&&this.setCache(),this.state.loading&&this.loadAsync()},i.componentDidUpdate=function(e,t){t.cacheKey!==this.state.cacheKey&&this.loadAsync()},i.componentWillUnmount=function(){this.mounted=!1},i.safeSetState=function(e,t){this.mounted&&this.setState(e,t)},i.getCacheKey=function(){return y(this.props)},i.getCache=function(){return p[this.getCacheKey()]},i.setCache=function(e){void 0===e&&(e=void 0),p[this.getCacheKey()]=e},i.triggerOnLoad=function(){var e=this;f&&setTimeout((function(){f(e.state.result,e.props)}))},i.loadSync=function(){if(this.state.loading)try{var e=h(d.requireSync(this.props),this.props,E);this.state.result=e,this.state.loading=!1}catch(e){console.error("loadable-components: failed to synchronously load component, which expected to be available",{fileName:d.resolve(this.props),chunkName:d.chunkName(this.props),error:e?e.message:e}),this.state.error=e}},i.loadAsync=function(){var e=this,t=this.resolveAsync();return t.then((function(t){var r=h(t,e.props,E);e.safeSetState({result:r,loading:!1},(function(){return e.triggerOnLoad()}))})).catch((function(t){return e.safeSetState({error:t,loading:!1})})),t},i.resolveAsync=function(){var e=this.props,t=(e.__chunkExtractor,e.forwardedRef,c(e,["__chunkExtractor","forwardedRef"]));return _(t)},i.render=function(){var e=this.props,t=e.forwardedRef,r=e.fallback,n=(e.__chunkExtractor,c(e,["forwardedRef","fallback","__chunkExtractor"])),a=this.state,i=a.error,l=a.loading,f=a.result;if(o.suspense&&"PENDING"===(this.getCache()||this.loadAsync()).status)throw this.loadAsync();if(i)throw i;var d=r||o.fallback||null;return l?d:s({fallback:d,result:f,options:o,props:u({},n,{ref:t})})},a}(t.Component),S=(b=function(e){return t.createElement(a.Consumer,null,(function(r){return t.createElement(v,Object.assign({__chunkExtractor:r},e))}))},(v=C).displayName&&(b.displayName=v.displayName+"WithChunkExtractor"),b),E=t.forwardRef((function(e,r){return t.createElement(S,Object.assign({forwardedRef:r},e))}));return E.displayName="Loadable",E.preload=function(e){E.load(e)},E.load=function(e){return _(e)},E}return{loadable:d,lazy:function(e,t){return d(e,u({},t,{suspense:!0}))}}}var b=v({defaultResolveComponent:function(e){return e.__esModule?e.default:e.default||e},render:function(e){var r=e.result,n=e.props;return t.createElement(r,n)}}),_=b.loadable,C=b.lazy,S=v({onLoad:function(e,t){e&&t.forwardedRef&&("function"==typeof t.forwardedRef?t.forwardedRef(e):t.forwardedRef.current=e)},render:function(e){var t=e.result,r=e.props;return r.children?r.children(t):null}}),E=S.loadable,w=S.lazy,g="undefined"!=typeof window;var R=_;R.lib=E;var x=C;x.lib=w;var O=s;e.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=O,e.default=R,e.lazy=x,e.loadableReady=function(e,t){void 0===e&&(e=function(){});var r=void 0===t?{}:t,n=r.namespace,a=void 0===n?"":n,s=r.chunkLoadingGlobal,c=void 0===s?"__LOADABLE_LOADED_CHUNKS__":s;if(!g)return o("`loadableReady()` must be called in browser only"),e(),Promise.resolve();var u=null;if(g){var l=i(a),f=document.getElementById(l);if(f){u=JSON.parse(f.textContent);var d=document.getElementById(l+"_ext");if(!d)throw new Error("loadable-component: @loadable/server does not match @loadable/component");JSON.parse(d.textContent).namedChunks.forEach((function(e){m.initialChunks[e]=!0}))}}if(!u)return o("`loadableReady()` requires state, please use `getScriptTags` or `getScriptElements` server-side"),e(),Promise.resolve();var p=!1;return new Promise((function(e){window[c]=window[c]||[];var t=window[c],r=t.push.bind(t);function n(){u.every((function(e){return t.some((function(t){return t[0].indexOf(e)>-1}))}))&&(p||(p=!0,e()))}t.push=function(){r.apply(void 0,arguments),n()},n()})).then(e)},Object.defineProperty(e,"__esModule",{value:!0})}));
++!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("react"),require("hoist-non-react-statics")):"function"==typeof define&&define.amd?define(["exports","react","hoist-non-react-statics"],t):t((e=e||self).loadable={},e.React,e.hoistNonReactStatics)}(this,(function(e,t,r){"use strict";function n(e,t){if(!e){var r=new Error("loadable: "+t);throw r.framesToPop=1,r.name="Invariant Violation",r}}function o(e){console.warn("loadable: "+e)}t=t&&t.hasOwnProperty("default")?t.default:t,r=r&&r.hasOwnProperty("default")?r.default:r;var a=t.createContext();function s(e){return e+"__LOADABLE_REQUIRED_CHUNKS__"}var i=Object.freeze({__proto__:null,getRequiredChunkKey:s,invariant:n,Context:a});function u(e,t){if(null==e)return{};var r,n,o={},a=Object.keys(e);for(n=0;n<a.length;n++)r=a[n],t.indexOf(r)>=0||(o[r]=e[r]);return o}function c(){return(c=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e}).apply(this,arguments)}function l(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function f(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}function d(e,t){return e(t={exports:{}},t.exports),t.exports}var p=d((function(e,t){Object.defineProperty(t,"__esModule",{value:!0});var r="function"==typeof Symbol&&Symbol.for,n=r?Symbol.for("react.element"):60103,o=r?Symbol.for("react.portal"):60106,a=r?Symbol.for("react.fragment"):60107,s=r?Symbol.for("react.strict_mode"):60108,i=r?Symbol.for("react.profiler"):60114,u=r?Symbol.for("react.provider"):60109,c=r?Symbol.for("react.context"):60110,l=r?Symbol.for("react.async_mode"):60111,f=r?Symbol.for("react.concurrent_mode"):60111,d=r?Symbol.for("react.forward_ref"):60112,p=r?Symbol.for("react.suspense"):60113,y=r?Symbol.for("react.suspense_list"):60120,h=r?Symbol.for("react.memo"):60115,m=r?Symbol.for("react.lazy"):60116,v=r?Symbol.for("react.fundamental"):60117,_=r?Symbol.for("react.responder"):60118,b=r?Symbol.for("react.scope"):60119;function S(e){if("object"==typeof e&&null!==e){var t=e.$$typeof;switch(t){case n:switch(e=e.type){case l:case f:case a:case i:case s:case p:return e;default:switch(e=e&&e.$$typeof){case c:case d:case m:case h:case u:return e;default:return t}}case o:return t}}}function C(e){return S(e)===f}t.typeOf=S,t.AsyncMode=l,t.ConcurrentMode=f,t.ContextConsumer=c,t.ContextProvider=u,t.Element=n,t.ForwardRef=d,t.Fragment=a,t.Lazy=m,t.Memo=h,t.Portal=o,t.Profiler=i,t.StrictMode=s,t.Suspense=p,t.isValidElementType=function(e){return"string"==typeof e||"function"==typeof e||e===a||e===f||e===i||e===s||e===p||e===y||"object"==typeof e&&null!==e&&(e.$$typeof===m||e.$$typeof===h||e.$$typeof===u||e.$$typeof===c||e.$$typeof===d||e.$$typeof===v||e.$$typeof===_||e.$$typeof===b)},t.isAsyncMode=function(e){return C(e)||S(e)===l},t.isConcurrentMode=C,t.isContextConsumer=function(e){return S(e)===c},t.isContextProvider=function(e){return S(e)===u},t.isElement=function(e){return"object"==typeof e&&null!==e&&e.$$typeof===n},t.isForwardRef=function(e){return S(e)===d},t.isFragment=function(e){return S(e)===a},t.isLazy=function(e){return S(e)===m},t.isMemo=function(e){return S(e)===h},t.isPortal=function(e){return S(e)===o},t.isProfiler=function(e){return S(e)===i},t.isStrictMode=function(e){return S(e)===s},t.isSuspense=function(e){return S(e)===p}}));f(p);p.typeOf,p.AsyncMode,p.ConcurrentMode,p.ContextConsumer,p.ContextProvider,p.Element,p.ForwardRef,p.Fragment,p.Lazy,p.Memo,p.Portal,p.Profiler,p.StrictMode,p.Suspense,p.isValidElementType,p.isAsyncMode,p.isConcurrentMode,p.isContextConsumer,p.isContextProvider,p.isElement,p.isForwardRef,p.isFragment,p.isLazy,p.isMemo,p.isPortal,p.isProfiler,p.isStrictMode,p.isSuspense;var y=d((function(e,t){}));f(y);y.typeOf,y.AsyncMode,y.ConcurrentMode,y.ContextConsumer,y.ContextProvider,y.Element,y.ForwardRef,y.Fragment,y.Lazy,y.Memo,y.Portal,y.Profiler,y.StrictMode,y.Suspense,y.isValidElementType,y.isAsyncMode,y.isConcurrentMode,y.isContextConsumer,y.isContextProvider,y.isElement,y.isForwardRef,y.isFragment,y.isLazy,y.isMemo,y.isPortal,y.isProfiler,y.isStrictMode,y.isSuspense,d((function(e){e.exports=p}));var h={initialChunks:{}},m=Symbol.for("react.lazy");function v(e){if(-1===e._status){var t=e._ctor.requireAsync();if(t.then((function(t){if(0===e._status||-1===e._status){var r=e;r._status=1,r._result=t}}),(function(t){if(0===e._status||-1===e._status){var r=e;r._status=2,r._result=t}})),-1===e._status){var r=e;r._status=0,r._result=t}}if(1===e._status){var n=e._result;return e._ctor.onResolve(n.default)}throw e._result}var _=function(e){var r=function(r){return t.createElement(a.Consumer,null,(function(n){return t.createElement(e,Object.assign({__chunkExtractor:n},r))}))};return e.displayName&&(r.displayName=e.displayName+"WithChunkExtractor"),r},b=function(e){return e};function S(e){var o=e.defaultResolveComponent,a=void 0===o?b:o,s=e.render,i=e.onLoad;function f(e,o){void 0===o&&(o={});var f=function(e){return"function"==typeof e?{requireAsync:e,resolve:function(){},chunkName:function(){}}:e}(e),d={};function p(e){return o.cacheKey?o.cacheKey(e):f.resolve?f.resolve(e):"static"}function y(e,t,n){var s=o.resolveComponent?o.resolveComponent(e,t):a(e);if(o.resolveComponent&&!(void 0)(s))throw new Error("resolveComponent returned something that is not a React component!");return r(n,s,{preload:!0}),s}var b=function(e){var t=p(e),r=d[t];return r&&"REJECTED"!==r.status||((r=f.requireAsync(e)).status="PENDING",d[t]=r,r.then((function(){r.status="RESOLVED"}),(function(t){console.error("loadable-components: failed to asynchronously load component",{fileName:f.resolve(e),chunkName:f.chunkName(e),error:t?t.message:t}),r.status="REJECTED"}))),r},S=function(e){var t,r;function a(t){var r;return(r=e.call(this,t)||this).state={result:null,error:null,loading:!0,cacheKey:p(t)},n(!t.__chunkExtractor||f.requireSync,"SSR requires `@loadable/babel-plugin`, please install it"),t.__chunkExtractor?!1===o.ssr?l(r):(f.requireAsync(t).catch((function(){return null})),r.loadSync(),t.__chunkExtractor.addChunk(f.chunkName(t)),l(r)):(!1!==o.ssr&&(f.isReady&&f.isReady(t)||f.chunkName&&h.initialChunks[f.chunkName(t)])&&r.loadSync(),r)}r=e,(t=a).prototype=Object.create(r.prototype),t.prototype.constructor=t,t.__proto__=r,a.getDerivedStateFromProps=function(e,t){var r=p(e);return c({},t,{cacheKey:r,loading:t.loading||t.cacheKey!==r})};var m=a.prototype;return m.componentDidMount=function(){this.mounted=!0;var e=this.getCache();e&&"REJECTED"===e.status&&this.setCache(),this.state.loading&&this.loadAsync()},m.componentDidUpdate=function(e,t){t.cacheKey!==this.state.cacheKey&&this.loadAsync()},m.componentWillUnmount=function(){this.mounted=!1},m.safeSetState=function(e,t){this.mounted&&this.setState(e,t)},m.getCacheKey=function(){return p(this.props)},m.getCache=function(){return d[this.getCacheKey()]},m.setCache=function(e){void 0===e&&(e=void 0),d[this.getCacheKey()]=e},m.triggerOnLoad=function(){var e=this;i&&setTimeout((function(){i(e.state.result,e.props)}))},m.loadSync=function(){if(this.state.loading)try{var e=y(f.requireSync(this.props),this.props,E);this.state.result=e,this.state.loading=!1}catch(e){console.error("loadable-components: failed to synchronously load component, which expected to be available",{fileName:f.resolve(this.props),chunkName:f.chunkName(this.props),error:e?e.message:e}),this.state.error=e}},m.loadAsync=function(){var e=this,t=this.resolveAsync();return t.then((function(t){var r=y(t,e.props,E);e.safeSetState({result:r,loading:!1},(function(){return e.triggerOnLoad()}))})).catch((function(t){return e.safeSetState({error:t,loading:!1})})),t},m.resolveAsync=function(){var e=this.props,t=(e.__chunkExtractor,e.forwardedRef,u(e,["__chunkExtractor","forwardedRef"]));return b(t)},m.render=function(){var e=this.props,t=e.forwardedRef,r=e.fallback,n=(e.__chunkExtractor,u(e,["forwardedRef","fallback","__chunkExtractor"])),a=this.state,i=a.error,l=a.loading,f=a.result;if(o.suspense&&"PENDING"===(this.getCache()||this.loadAsync()).status)throw this.loadAsync();if(i)throw i;var d=r||o.fallback||null;return l?d:s({fallback:d,result:f,options:o,props:c({},n,{ref:t})})},a}(t.Component);if(o.ssrSuspense)return function(e){return function(e){var t={_status:-1,_result:e.requireAsync,_ctor:e};return{$$typeof:m,_payload:t,_init:v}}(c({},e,{onResolve:function(r){return _((function(n){n.forwardRef;var o=n.__chunkExtractor,a=u(n,["forwardRef","__chunkExtractor"]);return o&&o.addChunk(e.chunkName(a)),t.createElement(r,a)}))}}))}(f);var C=_(S),E=t.forwardRef((function(e,r){return t.createElement(C,Object.assign({forwardedRef:r},e))}));return E.displayName="Loadable",E.preload=function(e){E.load(e)},E.load=function(e){return b(e)},E}return{loadable:f,lazy:function(e,t){return f(e,c({},t,{suspense:!0}))}}}var C=S({defaultResolveComponent:function(e){return e.__esModule?e.default:e.default||e},render:function(e){var r=e.result,n=e.props;return t.createElement(r,n)}}),E=C.loadable,w=C.lazy,g=S({onLoad:function(e,t){e&&t.forwardedRef&&("function"==typeof t.forwardedRef?t.forwardedRef(e):t.forwardedRef.current=e)},render:function(e){var t=e.result,r=e.props;return r.children?r.children(t):null}}),R=g.loadable,x=g.lazy,k="undefined"!=typeof window;var O=E;O.lib=R;var P=w;P.lib=x;var M=i;e.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=M,e.default=O,e.lazy=P,e.loadableReady=function(e,t){void 0===e&&(e=function(){});var r=void 0===t?{}:t,n=r.namespace,a=void 0===n?"":n,i=r.chunkLoadingGlobal,u=void 0===i?"__LOADABLE_LOADED_CHUNKS__":i;if(!k)return o("`loadableReady()` must be called in browser only"),e(),Promise.resolve();var c=null;if(k){var l=s(a),f=document.getElementById(l);if(f){c=JSON.parse(f.textContent);var d=document.getElementById(l+"_ext");if(!d)throw new Error("loadable-component: @loadable/server does not match @loadable/component");JSON.parse(d.textContent).namedChunks.forEach((function(e){h.initialChunks[e]=!0}))}}if(!c)return o("`loadableReady()` requires state, please use `getScriptTags` or `getScriptElements` server-side"),e(),Promise.resolve();var p=!1;return new Promise((function(e){window[u]=window[u]||[];var t=window[u],r=t.push.bind(t);function n(){c.every((function(e){return t.some((function(t){return t[0].indexOf(e)>-1}))}))&&(p||(p=!0,e()))}t.push=function(){r.apply(void 0,arguments),n()},n()})).then(e)},Object.defineProperty(e,"__esModule",{value:!0})}));

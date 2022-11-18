@@ -1,19 +1,33 @@
-import React from 'react';
-import loadable from '@loadable/component'
-const OtherComponent = loadable(() => import('./OtherComponent'), { suspense: true})
 
-export default () => (
-  <div>
-    <div style={{
-      backgroundColor: 'black',
-      color: 'lightgrey',
-      padding: '1rem'
-    }} onClick={() => alert('shell is interactive')}>
-     <h1>Module Federation Example: Server Side Rendering</h1>
-     <h2>This is the shell application.</h2>
+import React from 'react'
+import { ErrorBoundary } from 'react-error-boundary';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import loadable from '@loadable/component'
+import Html from './Html'
+
+const OtherComponent = loadable(() => import('./OtherComponent'), { ssrSuspense: true })
+
+const App = ({ assets }) => {
+  return (
+    <Html assets={assets} title="Hello">
+      <React.Suspense fallback="Loading">
+        <ErrorBoundary FallbackComponent={Error}>  
+        <OtherComponent />
+
+        </ErrorBoundary>
+      </React.Suspense>
+    </Html>
+  )
+}
+
+function Error({ error }) {
+  return (
+    <div>
+      <h1>Application Error</h1>
+      <pre style={{ whiteSpace: 'pre-wrap' }}>{error.stack}</pre>
     </div>
-    <React.Suspense fallback="Loading">
-      <OtherComponent />
-    </React.Suspense>
-  </div >
-);
+  );
+}
+
+export default App

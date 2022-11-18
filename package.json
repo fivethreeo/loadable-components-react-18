@@ -19,7 +19,6 @@
     "@babel/plugin-syntax-import-meta": "7.10.4",
     "@elzzad/dazzle-babel-loader": "^0.1.0-alpha.1",
     "@loadable/babel-plugin": "^5.13.2",
-    "@loadable/component": "^5.15.2",
     "@loadable/webpack-plugin": "^5.15.2",
     "babel-plugin-polyfill-corejs3": "^0.6.0",
     "browserslist": "^4.21.4",
@@ -38,11 +37,19 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "@loadable/component": "^5.15.2",
     "@loadable/server": "^5.15.2",
     "ejs": "^3.1.8",
     "express": "^4.18.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^3.1.4",
     "react-helmet": "^6.1.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@loadable/server@5.15.2": "patches/@loadable__server@5.15.2.patch",
+      "@loadable/component@5.15.2": "patches/@loadable__component@5.15.2.patch"
+    }
   }
 }

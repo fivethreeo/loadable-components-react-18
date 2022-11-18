@@ -1,0 +1,57 @@
+diff --git a/lib/ChunkExtractor.js b/lib/ChunkExtractor.js
+index 6d0737b55b2a57b2ea8a392e2f5fafb7db2dd75f..a06a53e5f9a2fba88fb2914aa060b0da2b82423e 100644
+--- a/lib/ChunkExtractor.js
++++ b/lib/ChunkExtractor.js
+@@ -21,6 +21,10 @@ var _ChunkExtractorManager = _interopRequireDefault(require("./ChunkExtractorMan
+ 
+ var _util = require("./util");
+ 
++var _assert = require("assert");
++
++var _console = require("console");
++
+ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+ 
+ function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+@@ -207,6 +211,7 @@ class ChunkExtractor {
+     this.statsFile = statsFile;
+     this.entrypoints = Array.isArray(entrypoints) ? entrypoints : [entrypoints];
+     this.chunks = [];
++    this.seenChunks = [];
+     this.inputFileSystem = inputFileSystem;
+   }
+ 
+@@ -447,6 +452,33 @@ class ChunkExtractor {
+     return assets.map(asset => assetToLinkElement(asset, extraProps));
+   }
+ 
++  getLinkTagsSince(extraProps = {}) {
++    const assets = this.getPreAssets();
++    const linkTags = assets.map(asset => {
++      if (!this.seenChunks.includes(asset.chunk)) {
++        this.seenChunks.push(asset.chunk);
++        return assetToLinkTag(asset, extraProps);
++      }
++
++      return false;
++    });
++    return joinTags(linkTags.filter(tag => Boolean(tag)));
++  }
++
++  getScriptTagsSince(extraProps = {}) {
++    const requiredScriptTag = this.getRequiredChunksScriptTag(extraProps);
++    const mainAssets = this.getMainAssets('script');
++    const assetsScriptTags = mainAssets.map(asset => {
++      if (!this.seenChunks.includes(asset.chunk)) {
++        this.seenChunks.push(asset.chunk);
++        return assetToScriptTag(asset, extraProps);
++      }
++
++      return false;
++    });
++    return joinTags(assetsScriptTags.filter(tag => Boolean(tag)));
++  }
++
+ }
+ 
+ var _default = ChunkExtractor;
