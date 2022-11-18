@@ -1,26 +1,40 @@
 
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { ErrorBoundary } from 'react-error-boundary';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import loadable from '@loadable/component'
 import Html from './Html'
 
-const OtherComponent = loadable(() => import('./OtherComponent'), { ssrSuspense: true })
+
+const Comments = loadable(() => import('./Comments' /* webpackPrefetch: true */), { ssrSuspense: true });
+const Post = loadable(() => import('./Post' /* webpackPrefetch: true */), { ssrSuspense: true });
 
 const App = ({ assets }) => {
   return (
     <Html assets={assets} title="Hello">
-      <React.Suspense fallback="Loading">
-        <ErrorBoundary FallbackComponent={Error}>  
-        <OtherComponent />
-
+      <Suspense fallback="Loading">
+        <ErrorBoundary FallbackComponent={Error}>
+          <Content />
         </ErrorBoundary>
-      </React.Suspense>
+      </Suspense>
     </Html>
   )
 }
 
+function Content() {
+  return (
+    <>
+      <Suspense fallback="Loading">
+        <Post />
+      </Suspense>
+      <Suspense fallback="Loading">
+        <Comments />
+      </Suspense>
+      <h2>Thanks for reading!</h2>
+    </>
+  );
+}
 function Error({ error }) {
   return (
     <div>
