@@ -9,10 +9,19 @@
   
     // These tasks can be run from CodeSandbox. Running one will open a log in the app.
     "tasks": {
+      "patch": {
+        "name": "patch",
+        "command": "patch -d node_modules/@loadable/server -p1 < patches/@loadable__server@5.15.2.patch && patch -d node_modules/@loadable/component -p1 < patches/@loadable__component@5.15.2.patch",
+        "runAtStart": true
+      },
       "start": {
         "name": "start",
         "command": "pnpm start",
-        "runAtStart": true
+        "runAtStart": true,
+        "restartOn": {
+          "files": ["pnpm-lock.yaml", "**/package.json", "config/**/*"], // File globs that trigger this task to restart
+          "branch": true // restart this task when creating a new branch/fork
+        }
       },
       "build": {
         "name": "build",

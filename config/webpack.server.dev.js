@@ -20,6 +20,7 @@ const config = {
     path: path.resolve(__dirname, "../dist/server"),
     filename: "[name].js",
     libraryTarget: "commonjs-module",
+    publicPath: shared.devPublicpath
   },
   mode: shared.devMode,
   resolve: {

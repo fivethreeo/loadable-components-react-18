@@ -22,7 +22,7 @@ const config = {
     path: path.resolve(__dirname, "../dist/client"),
     filename: "[name].js",
     chunkFilename: "[name].js",
-    publicPath: "http://localhost:3001/static/",
+    publicPath: shared.devPublicpath
   },
   resolve: {
     extensions: shared.extensions
@@ -55,6 +55,7 @@ const config = {
     colors: true,
   },
   devServer: {
+    allowedHosts: "all",
     static: {
       directory: path.join(__dirname, '../public'),
     },
