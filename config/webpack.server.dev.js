@@ -36,7 +36,7 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.server,
-    new StartServerPlugin("main"),
+    new StartServerPlugin({ entryName: "main", signal: 'SIGTERM' }),
     new webpack.ContextReplacementPlugin(
       // we want to replace context
       /express\/lib/,                    // and replace all searches in
