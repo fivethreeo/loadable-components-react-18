@@ -4,9 +4,7 @@ export default function Post() {
       <>
         <h1>Hello world</h1>
         <p>
-          This demo is <b>artificially slowed down</b>. Open{' '}
-          <code>server/delays.js</code> to adjust how much different things are
-          slowed down.
+          This demo is <b>artificially slowed down</b>.
         </p>
         <p>
           Notice how HTML for comments "streams in" before the JS (or React) has
