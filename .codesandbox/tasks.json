@@ -19,8 +19,12 @@
         "command": "pnpm start",
         "runAtStart": true,
         "restartOn": {
-          "files": ["pnpm-lock.yaml", "**/package.json", "config/**/*"], // File globs that trigger this task to restart
+          //"files": ["pnpm-lock.yaml", "**/package.json", "config/**/*"], // File globs that trigger this task to restart
           "branch": true // restart this task when creating a new branch/fork
+        },
+        "preview": {
+          "port": 3000,
+          "pr-link": "direct"
         }
       },
       "build": {
