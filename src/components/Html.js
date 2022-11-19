@@ -17,11 +17,6 @@ export default function Html({ assets, children, title }) {
             }}
           />
           {children}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `assetManifest = ${JSON.stringify(assets)};`
-            }}
-          />
         </body>
       </html>
     );
