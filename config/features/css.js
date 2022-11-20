@@ -1,5 +1,7 @@
+// https://webpack.js.org/loaders/css-loader/
 const clone = require("../clone")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const minicssextract = require('../stubs/minicssextract')
+const scss = false // require('../stubs/scss')
 
 const postCssOptions = {
     sourceMap: false,
@@ -26,30 +28,27 @@ const config = {
                                 localIdentName: "[name]__[local]___[hash:base64:5]"
                             },
                         }
-                    }]
+                    }, ...(scss ? scss.prod.server : [])]
             }],
 
             client: [{
                 test: /\.css$/,
-                use: [
+                use: [...(minicssextract ? minicssextract.loaders.prod.client : []),
                     {
-                        loader: MiniCssExtractPlugin.loader,
-                    },
-                    {
-                        loader: "css-loader",
-                        options: {
-                            sourceMap: false,
-                            importLoaders: 1,
-                            modules: {
-                                auto: true,
-                                localIdentName: "[name]__[local]___[hash:base64:5]",
-                            },
-                        }
-                    },
-                    {
-                        loader: "postcss-loader",
-                        options: postCssOptions,
-                    }]
+                    loader: "css-loader",
+                    options: {
+                        sourceMap: false,
+                        importLoaders: 1,
+                        modules: {
+                            auto: true,
+                            localIdentName: "[name]__[local]___[hash:base64:5]",
+                        },
+                    }
+                },
+                {
+                    loader: "postcss-loader",
+                    options: postCssOptions,
+                }, ...(scss ? scss.prod.client : [])]
             }],
         },
 
@@ -68,7 +67,7 @@ const config = {
                                 localIdentName: "[name]__[local]___[hash:base64:5]"
                             },
                         }
-                    }]
+                    }, ...(scss ? scss.dev.server : [])]
             }],
 
             client: [{
@@ -91,7 +90,7 @@ const config = {
                     {
                         loader: "postcss-loader",
                         options: { postcssOptions: postCssOptions },
-                    }]
+                    }, ...(scss ? scss.dev.client : [])]
             }],
         }
     },
@@ -99,12 +98,7 @@ const config = {
         prod: {
             server: [],
             client: [
-                new MiniCssExtractPlugin({
-                    // Options similar to the same options in webpackOptions.output
-                    // both options are optional
-                    filename: "[name].css",
-                    chunkFilename: "[id].css",
-                })
+                ...(minicssextract ? minicssextract.plugins.prod.client : [])
             ]
         },
 
