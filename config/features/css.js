@@ -1,7 +1,7 @@
 // https://webpack.js.org/loaders/css-loader/
 const clone = require("../clone")
-const minicssextract = require('../stubs/minicssextract')
-const scss = false // require('../stubs/scss')
+const minicssextract = false ? require('../stubs/minicssextract') : false;
+const scss = false ? require('../stubs/scss') : false
 
 const postCssOptions = {
     sourceMap: false,
@@ -111,4 +111,4 @@ const config = {
 };
 
 
-module.exports = config;
+module.exports = config; 
