@@ -1,6 +1,7 @@
 import path from 'path';
 import clone from '../clone.mjs';
 import typescript from '../stubs/typescript.mjs';
+import shared from '../shared.mjs';
 
 const config = {
     rules: {
@@ -9,6 +10,7 @@ const config = {
             {
                 test: /\.(js|jsx|mjs)$/,
                 exclude: /node_modules/,
+                include: [shared.srcDir, shared.serverDir],
                 use: typescript.prod.server
             }],
 
@@ -16,6 +18,7 @@ const config = {
             {
                 test: /\.(js|jsx|mjs)$/,
                 exclude: /node_modules/,
+                include: [shared.srcDir],
                 use: typescript.prod.client
             }],
 

@@ -1,10 +1,6 @@
 import path from 'path';
 import clone from '../clone.mjs';
-
-import * as url from 'url';
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+import shared from '../shared.mjs';
 
 const config = {
     prod: {
@@ -15,7 +11,7 @@ const config = {
 
                     dazzleBuildName: "server",
                     isServer: true,
-                    cwd: path.join("..", __dirname),
+                    cwd: shared.appDir,
                     browserslistEnv: "server",
                     cache: true,
                     babelPresetPlugins: [],
@@ -33,7 +29,7 @@ const config = {
 
                     dazzleBuildName: "client",
                     isServer: false,
-                    cwd: path.join("..", __dirname),
+                    cwd: shared.appDir,
                     browserslistEnv: "client",
                     cache: true,
                     babelPresetPlugins: [],

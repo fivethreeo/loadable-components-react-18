@@ -26,6 +26,7 @@ const config = {
   resolve: {
     extensions: shared.extensions
   },
+  externals: externals,
   module: {
     strictExportPresence: true,
     rules: [
