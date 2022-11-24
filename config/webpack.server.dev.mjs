@@ -18,6 +18,7 @@ const config = {
   name: "server",
   dependencies: ["client"],
   target: "browserslist:server",
+  context: shared.appDir,
   entry: [path.resolve(__dirname, "../server/index.js")],
   output: {
     path: path.resolve(__dirname, "../dist/server"),

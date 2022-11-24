@@ -17,6 +17,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const config = {
   name: "client",
   target: "browserslist:client",
+  context: shared.appDir,
   entry: [path.resolve(__dirname, "../src/index.js")],
   mode: shared.prodMode,
   devtool: "source-map",
