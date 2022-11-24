@@ -1,16 +1,17 @@
-const util = require("util")
-const path = require("path");
+import util from 'util';
+import path from 'path';
+import webpack from 'webpack';
+import shared from './shared.mjs';
+import auto from './features/auto.mjs';
+import typescript from './features/typescript.mjs';
+import assets from './features/assets.mjs';
+import css from './features/css.mjs';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
-const webpack = require("webpack");
+import * as url from 'url';
 
-const shared = require("./shared");
-const auto = require("./features/auto")
-const typescript = require("./features/typescript");
-const assets = require("./features/assets")
-const css = require("./features/css");
-
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const LoadablePlugin = require('@loadable/webpack-plugin')
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const config = {
   name: "client",
@@ -37,7 +38,6 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.client,
-    new LoadablePlugin(),
       // No need for any caniuse regions data (for require context in browserslist)
       new webpack.ContextReplacementPlugin(
         /caniuse-lite[\/\\]data[\/\\]regions/,
@@ -68,4 +68,4 @@ const config = {
 
 console.log(util.inspect(config, false, 6, true));
 
-module.exports = config;
+export default config;

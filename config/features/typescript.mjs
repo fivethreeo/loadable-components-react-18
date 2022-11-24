@@ -1,6 +1,6 @@
-const path = require("path");
-const clone = require("../clone")
-const typescript = require("../stubs/typescript")
+import path from 'path';
+import clone from '../clone.mjs';
+import typescript from '../stubs/typescript.mjs';
 
 const config = {
     rules: {
@@ -32,4 +32,4 @@ const config = {
 config.rules.dev.server = clone(config.rules.prod.server);
 config.rules.dev.client = clone(config.rules.prod.client);
 
-module.exports = config;
+export default config;

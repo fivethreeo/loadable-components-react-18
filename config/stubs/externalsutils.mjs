@@ -1,4 +1,4 @@
-exports.NODE_RESOLVE_OPTIONS = {
+export const NODE_RESOLVE_OPTIONS = {
     dependencyType: 'commonjs',
     modules: ['node_modules'],
     fallback: false,
@@ -15,12 +15,13 @@ exports.NODE_RESOLVE_OPTIONS = {
     fullySpecified: false,
     preferRelative: false,
     preferAbsolute: false,
-    restrictions: [],
+    restrictions: []
 };
-exports.NODE_BASE_RESOLVE_OPTIONS = Object.assign(Object.assign({}, exports.NODE_RESOLVE_OPTIONS), { alias: false });
-exports.NODE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, exports.NODE_RESOLVE_OPTIONS), { alias: false, dependencyType: 'esm', conditionNames: ['node', 'import'], fullySpecified: true });
-exports.NODE_BASE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, exports.NODE_ESM_RESOLVE_OPTIONS), { alias: false });
-async function resolveExternal(appDir, esmExternalsConfig, context, request, isEsmRequested, getResolve, isLocalCallback, baseResolveCheck = true, esmResolveOptions = exports.NODE_ESM_RESOLVE_OPTIONS, nodeResolveOptions = exports.NODE_RESOLVE_OPTIONS, baseEsmResolveOptions = exports.NODE_BASE_ESM_RESOLVE_OPTIONS, baseResolveOptions = exports.NODE_BASE_RESOLVE_OPTIONS) {
+export const NODE_BASE_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_RESOLVE_OPTIONS), { alias: false });
+export const NODE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_RESOLVE_OPTIONS), { alias: false, dependencyType: 'esm', conditionNames: ['node', 'import'], fullySpecified: true });
+export const NODE_BASE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_ESM_RESOLVE_OPTIONS), { alias: false });
+
+export async function resolveExternal(appDir, esmExternalsConfig, context, request, isEsmRequested, getResolve, isLocalCallback, baseResolveCheck = true, esmResolveOptions = NODE_ESM_RESOLVE_OPTIONS, nodeResolveOptions = exports.NODE_RESOLVE_OPTIONS, baseEsmResolveOptions = NODE_BASE_ESM_RESOLVE_OPTIONS, baseResolveOptions = NODE_BASE_RESOLVE_OPTIONS) {
     const esmExternals = !!esmExternalsConfig;
     const looseEsmExternals = esmExternalsConfig === 'loose';
     let res = null;
@@ -77,7 +78,3 @@ async function resolveExternal(appDir, esmExternalsConfig, context, request, isE
     }
     return { res, isEsm };
 }
-
-exports.resolveExternal = resolveExternal;
-
-module.exports = exports;

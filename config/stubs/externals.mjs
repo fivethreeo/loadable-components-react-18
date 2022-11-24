@@ -1,10 +1,11 @@
-const resolveExternal = require("./externalsutils").resolveExternal;
-const path = require("path");
+import { resolveExternal } from './externalsutils.mjs';
+import path from 'path';
 const esmExternals = 'loose';
 const looseEsmExternals = esmExternals === 'loose';
 
 
 async function handleExternals(context, request, dependencyType, getResolve) {
+  console.log(context, request, dependencyType, getResolve) ;
     // We need to externalize internal requests for files intended to
     // not be bundled.
     const isLocal = request.startsWith('.') ||
@@ -103,7 +104,8 @@ async function handleExternals(context, request, dependencyType, getResolve) {
     }
     // Default behavior: bundle the code!
 }
-module.exports = [
+
+export default [
         ({ context, request, dependencyType, getResolve, }) => {
             //            console.log(request);
             return handleExternals(context, request, dependencyType, (options) => {

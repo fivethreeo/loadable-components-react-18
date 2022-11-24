@@ -1,5 +1,6 @@
 // https://webpack.js.org/loaders/css-loader/
-const clone = require("../clone")
+import clone from '../clone.mjs';
+
 const minicssextract = false ? require('../stubs/minicssextract') : false;
 const scss = false ? require('../stubs/scss') : false
 
@@ -111,4 +112,4 @@ const config = {
 };
 
 
-module.exports = config; 
+export default config; 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --progress --config config/webpack.dev.js",
+    "start": "webpack serve --progress --config config/webpack.dev.mjs",
     "start:prod": "pnpm run build && pnpm run serve",
     "serve": "node dist/server/main.js",
     "build": "rimraf dist/client dist/server && webpack --progress --config config/webpack.prod.js"
@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.20.2",
     "@babel/plugin-proposal-class-properties": "7.17.12",
     "@babel/plugin-proposal-json-strings": "7.17.12",
     "@babel/plugin-proposal-object-rest-spread": "7.18.0",
@@ -25,6 +26,7 @@
     "chai": "^4.3.7",
     "css-loader": "^6.7.2",
     "css-minimizer-webpack-plugin": "^4.2.2",
+    "dotenv-cli": "^6.0.0",
     "mini-css-extract-plugin": "^2.6.1",
     "postcss": "^8.4.19",
     "postcss-loader": "^7.0.1",
@@ -33,7 +35,7 @@
     "rimraf": "^3.0.2",
     "style-loader": "^3.3.1",
     "webpack": "^5.75.0",
-    "webpack-cli": "^4.10.0",
+    "webpack-cli": "5",
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {

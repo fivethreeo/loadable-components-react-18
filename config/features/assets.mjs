@@ -1,4 +1,4 @@
-const clone = require("../clone")
+import clone from '../clone.mjs';
 
 const fileLoaderExclude = [
     /\.html$/,
@@ -55,4 +55,4 @@ config.rules.prod.client = clone(config.rules.prod.server);
 config.rules.dev.server = clone(config.rules.prod.server);
 config.rules.dev.client = clone(config.rules.prod.server);
 
-module.exports = config;
+export default config;

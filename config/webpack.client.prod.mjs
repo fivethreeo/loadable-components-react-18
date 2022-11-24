@@ -1,14 +1,12 @@
-const util = require("util")
-const path = require("path");
-
-const shared = require("./shared");
-const auto = require("./features/auto")
-const typescript = require("./features/typescript");
-const assets = require("./features/assets")
-const css = require("./features/css");
-
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const LoadablePlugin = require('@loadable/webpack-plugin')
+import util from 'util';
+import path from 'path';
+import shared from './shared.mjs';
+import auto from './features/auto.mjs';
+import typescript from './features/typescript.mjs';
+import assets from './features/assets.mjs';
+import css from './features/css.mjs';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import LoadablePlugin from '@loadable/webpack-plugin';
 
 const config = {
   name: "client",
@@ -51,4 +49,4 @@ const config = {
 
 console.log(util.inspect(config, false, 6, true));
 
-module.exports = config;
+export default config;

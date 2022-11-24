@@ -1,7 +1,8 @@
 // https://webpack.js.org/loaders/sass-loader/
 // pnpm add -D sass-loader sass
-const path = require("path");
-const clone = require("../clone")
+import path from 'path';
+
+import clone from '../clone.mjs';
 
 const config = {
     prod: {
@@ -35,4 +36,4 @@ config.prod.client = clone(config.prod.server);
 config.dev.server = clone(config.prod.server);
 config.dev.client = clone(config.prod.client);
 
-module.exports = config;
+export default config;

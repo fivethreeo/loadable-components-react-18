@@ -1,12 +1,11 @@
-const util = require("util")
-const path = require("path");
-const externals = require("./stubs/externals");
-
-const shared = require("./shared");
-const auto = require("./features/auto")
-const typescript = require("./features/typescript");
-const assets = require("./features/assets")
-const css = require("./features/css");
+import util from 'util';
+import path from 'path';
+import externals from './stubs/externals.mjs';
+import shared from './shared.mjs';
+import auto from './features/auto.mjs';
+import typescript from './features/typescript.mjs';
+import assets from './features/assets.mjs';
+import css from './features/css.mjs';
 
 const config = {
   name: "server",
@@ -44,4 +43,4 @@ const config = {
 
 console.log(util.inspect(config, false, 6, true));
 
-module.exports = config;
+export default config;

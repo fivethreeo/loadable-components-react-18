@@ -1,5 +1,5 @@
 // https://www.npmjs.com/package/mini-css-extract-plugin
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 const config = {
     loaders: {
@@ -39,4 +39,4 @@ const config = {
 };
 
 
-module.exports = config;
+export default config;

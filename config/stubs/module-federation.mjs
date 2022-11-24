@@ -1,8 +1,8 @@
-const deps = require("../package.json").dependencies;
-const { ModuleFederationPlugin } = require("webpack").container;
-const { NodeFederationPlugin, StreamingTargetPlugin } = require("@module-federation/node");
+import { dependencies as deps } from '../package.json.mjs';
+import 'webpack';
+import { NodeFederationPlugin, StreamingTargetPlugin } from '@module-federation/node';
 
-module.exports = {
+export default {
     client: new ModuleFederationPlugin({
         name: "shell",
         filename: "container.js",
@@ -29,4 +29,4 @@ module.exports = {
             },
         }),
     ]
-}
+};

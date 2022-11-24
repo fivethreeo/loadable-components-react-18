@@ -1,6 +1,10 @@
-const path = require("path");
-const clone = require("../clone")
+import path from 'path';
+import clone from '../clone.mjs';
 
+import * as url from 'url';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const config = {
     prod: {
@@ -50,4 +54,4 @@ const config = {
 config.dev.server = clone(config.prod.server);
 config.dev.client = clone(config.prod.client);
 
-module.exports = config;
+export default config;
