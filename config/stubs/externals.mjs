@@ -3,9 +3,9 @@ import path from 'path';
 const esmExternals = 'loose';
 const looseEsmExternals = esmExternals === 'loose';
 
-
 async function handleExternals(context, request, dependencyType, getResolve) {
-  console.log(context, request, dependencyType, getResolve) ;
+
+  // console.log(context, request, dependencyType, getResolve) ;
     // We need to externalize internal requests for files intended to
     // not be bundled.
     const isLocal = request.startsWith('.') ||
@@ -19,6 +19,8 @@ async function handleExternals(context, request, dependencyType, getResolve) {
     // are relative to requests we've already resolved here.
     // Absolute requires (require('/foo')) are extremely uncommon, but
     // also have no need for customization as they're already resolved.
+    //if (isLocal) { return }
+
     if (!isLocal) {
         /*         if (/^(?:next$|react(?:$|\/))/.test(request)) {
         return `commonjs ${request}`;
@@ -58,8 +60,11 @@ async function handleExternals(context, request, dependencyType, getResolve) {
         // We don't want to retry local requests
         // with other preferEsm options
         // }
+        return
     };
-    const resolveResult = await resolveExternal(process.cwd(), esmExternals, context, request, isEsmRequested, getResolve, isLocal ? isLocalCallback : undefined);
+
+    const resolveResult = await resolveExternal(process.cwd(), esmExternals, context, request, isEsmRequested, getResolve, isLocal ? isLocalCallback : undefined).catch(err=>console.log(err));
+
     if ('localRes' in resolveResult) {
         return resolveResult.localRes;
     }
@@ -106,7 +111,7 @@ async function handleExternals(context, request, dependencyType, getResolve) {
 }
 
 export default [
-        ({ context, request, dependencyType, getResolve, }) => {
+        async ({ context, request, dependencyType, getResolve, }) => {
             //            console.log(request);
             return handleExternals(context, request, dependencyType, (options) => {
                 const resolveFunction = getResolve && getResolve(options);

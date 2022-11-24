@@ -21,17 +21,31 @@ export const NODE_BASE_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_RE
 export const NODE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_RESOLVE_OPTIONS), { alias: false, dependencyType: 'esm', conditionNames: ['node', 'import'], fullySpecified: true });
 export const NODE_BASE_ESM_RESOLVE_OPTIONS = Object.assign(Object.assign({}, NODE_ESM_RESOLVE_OPTIONS), { alias: false });
 
-export async function resolveExternal(appDir, esmExternalsConfig, context, request, isEsmRequested, getResolve, isLocalCallback, baseResolveCheck = true, esmResolveOptions = NODE_ESM_RESOLVE_OPTIONS, nodeResolveOptions = exports.NODE_RESOLVE_OPTIONS, baseEsmResolveOptions = NODE_BASE_ESM_RESOLVE_OPTIONS, baseResolveOptions = NODE_BASE_RESOLVE_OPTIONS) {
+export async function resolveExternal(appDir,
+    esmExternalsConfig,
+    context,
+    request,
+    isEsmRequested,
+    getResolve,
+    isLocalCallback,
+    baseResolveCheck = true,
+    esmResolveOptions = NODE_ESM_RESOLVE_OPTIONS,
+    nodeResolveOptions = NODE_RESOLVE_OPTIONS,
+    baseEsmResolveOptions = NODE_BASE_ESM_RESOLVE_OPTIONS,
+    baseResolveOptions = NODE_BASE_RESOLVE_OPTIONS
+) {
     const esmExternals = !!esmExternalsConfig;
     const looseEsmExternals = esmExternalsConfig === 'loose';
     let res = null;
     let isEsm = false;
+
     const preferEsmOptions = esmExternals && isEsmRequested ? [true, false] : [false];
     for (const preferEsm of preferEsmOptions) {
         const resolve = getResolve(preferEsm ? esmResolveOptions : nodeResolveOptions);
         // Resolve the import with the webpack provided context, this
         // ensures we're resolving the correct version when multiple
         // exist.
+
         try {
             [res, isEsm] = await resolve(context, request);
         }
@@ -47,7 +61,6 @@ export async function resolveExternal(appDir, esmExternalsConfig, context, reque
             continue;
         }
         if (isLocalCallback) {
-            console.log(res);
             return { localRes: isLocalCallback(res) };
         }
         // Bundled Node.js code is relocated without its node_modules tree.

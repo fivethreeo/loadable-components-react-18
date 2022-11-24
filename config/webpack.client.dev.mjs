@@ -7,6 +7,7 @@ import typescript from './features/typescript.mjs';
 import assets from './features/assets.mjs';
 import css from './features/css.mjs';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import LoadablePlugin from '@loadable/webpack-plugin';
 
 import * as url from 'url';
 
@@ -39,6 +40,7 @@ const config = {
   },
   plugins: [
     ...css.plugins.dev.client,
+      new LoadablePlugin(),
       // No need for any caniuse regions data (for require context in browserslist)
       new webpack.ContextReplacementPlugin(
         /caniuse-lite[\/\\]data[\/\\]regions/,
