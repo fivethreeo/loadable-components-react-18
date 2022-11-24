@@ -8,6 +8,12 @@ import css from './features/css.mjs';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import LoadablePlugin from '@loadable/webpack-plugin';
 
+
+import * as url from 'url';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 const config = {
   name: "client",
   target: "browserslist:client",

@@ -7,6 +7,11 @@ import typescript from './features/typescript.mjs';
 import assets from './features/assets.mjs';
 import css from './features/css.mjs';
 
+import * as url from 'url';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 const config = {
   name: "server",
   dependencies: ["client"],

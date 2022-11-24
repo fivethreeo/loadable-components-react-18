@@ -7,7 +7,7 @@
     "start": "webpack serve --progress --config config/webpack.dev.mjs",
     "start:prod": "pnpm run build && pnpm run serve",
     "serve": "node dist/server/main.js",
-    "build": "rimraf dist/client dist/server && webpack --progress --config config/webpack.prod.js"
+    "build": "rimraf dist/client dist/server && webpack --progress --config config/webpack.prod.mjs"
   },
   "author": "",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "rimraf": "^3.0.2",
     "style-loader": "^3.3.1",
     "webpack": "^5.75.0",
-    "webpack-cli": "5",
+    "webpack-cli": "4",
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
