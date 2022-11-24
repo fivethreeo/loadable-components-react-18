@@ -12,7 +12,8 @@ const config = {
     prodMode: "production",
     prodMinimizeClient: true,
     devMode: "development",
-    devPublicpath: publicpath
+    devPublicpath: publicpath,
+    emitOnErrors: true
 };
 
 export default config;

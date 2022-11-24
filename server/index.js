@@ -23,4 +23,3 @@ if (module.hot) {
 
 initMiddleware(express, app, done);
 
-module.exports = app;

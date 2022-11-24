@@ -47,6 +47,7 @@ export async function resolveExternal(appDir, esmExternalsConfig, context, reque
             continue;
         }
         if (isLocalCallback) {
+            console.log(res);
             return { localRes: isLocalCallback(res) };
         }
         // Bundled Node.js code is relocated without its node_modules tree.

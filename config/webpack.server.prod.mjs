@@ -28,6 +28,7 @@ const config = {
   },
   externals: externals,
   module: {
+    strictExportPresence: true,
     rules: [
       ...auto.rules.prod.server,
       ...typescript.rules.prod.server,
@@ -39,7 +40,9 @@ const config = {
     ...css.plugins.prod.server,
   ],
   optimization: {
-    moduleIds: shared.moduleids
+    moduleIds: shared.moduleids,
+    emitOnErrors: shared.emitOnErrors,
+    minimize: false
   },
   stats: {
     colors: true,
